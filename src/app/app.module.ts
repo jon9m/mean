@@ -9,6 +9,7 @@ import { HeaderComponent } from './header/header.component';
 import { PostListComponent } from './posts/post-list/post-list.component';
 
 import { MatInputModule, MatCardModule, MatButtonModule, MatToolbarModule, MatExpansionModule } from '@angular/material';
+import { PostService } from './posts/post.service';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { MatInputModule, MatCardModule, MatButtonModule, MatToolbarModule, MatEx
     MatExpansionModule
 
   ],
+  // providers: [PostService],  //New - see Injecteable - provided in the service
   providers: [],
   bootstrap: [AppComponent]
 })
