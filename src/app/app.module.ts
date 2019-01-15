@@ -11,6 +11,8 @@ import { PostListComponent } from './posts/post-list/post-list.component';
 import { MatInputModule, MatCardModule, MatButtonModule, MatToolbarModule, MatExpansionModule } from '@angular/material';
 import { PostService } from './posts/post.service';
 
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -26,7 +28,8 @@ import { PostService } from './posts/post.service';
     MatCardModule,
     MatButtonModule,
     MatToolbarModule,
-    MatExpansionModule
+    MatExpansionModule,
+    HttpClientModule
 
   ],
   // providers: [PostService],  //New - see Injecteable - provided in the service
