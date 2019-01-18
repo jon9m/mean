@@ -1,24 +1,64 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Post } from '../post.model';
 import { NgForm } from '@angular/forms';
 import { PostService } from '../post.service';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 
 @Component({
   selector: 'app-post-create',
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.css']
 })
-export class PostCreateComponent {
-  constructor(public postService: PostService) {
+export class PostCreateComponent implements OnInit {
 
+  private mode = 'create';
+  private postId;
+  post: Post;
+
+  constructor(public postService: PostService, private route: ActivatedRoute) {
+
+  }
+
+  ngOnInit(): void {
+    this.route.paramMap.subscribe((paramMap: ParamMap) => {
+      if (paramMap.has('postId')) {
+        this.mode = 'edit';
+        this.postId = paramMap.get('postId');
+        this.postService.getPost(this.postId).subscribe(result => {
+          console.log(result.post);
+          this.post = { id: result.post._id, title: result.post.title, content: result.post.content };
+        });
+      } else {
+        this.mode = 'create';
+        this.postId = null;
+        this.post = { id: '', title: '', content: '' };
+      }
+    });
   }
 
   onAddPost = (form: NgForm) => {
     if (form.invalid) {
       return;
     }
-    const post: Post = { id: '1', title: form.value.title, content: form.value.content };
+    const post: Post = { id: null, title: form.value.title, content: form.value.content };
     this.postService.addPost(post);
     form.resetForm();
+  }
+
+  onUpdatePost = (form: NgForm) => {
+    if (form.invalid) {
+      return;
+    }
+    const post: Post = { id: this.postId, title: form.value.title, content: form.value.content };
+    this.postService.updatePost(post);
+    form.resetForm();
+  }
+
+  onSavePost = (form: NgForm) => {
+    if (this.mode === 'create') {
+      this.onAddPost(form);
+    } else {
+      this.onUpdatePost(form);
+    }
   }
 }
