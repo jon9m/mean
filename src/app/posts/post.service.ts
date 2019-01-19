@@ -2,6 +2,7 @@ import { Post } from './post.model';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { map } from 'rxjs/operators';
 
@@ -11,7 +12,7 @@ export class PostService {
   private posts: Post[] = [];
   private postSubject: Subject<any> = new Subject();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
 
   }
 
@@ -48,6 +49,7 @@ export class PostService {
 
       this.posts.push(post);
       this.postSubject.next([...this.posts]);
+      this.router.navigate(['/']);
     });
   }
 
@@ -77,6 +79,7 @@ export class PostService {
   updatePost(post: Post) {
     this.http.put('http://localhost:3000/api/posts/update/' + post.id, post).subscribe((resp) => {
       console.log(resp);
+      this.router.navigate(['/']);
     });
   }
 }
