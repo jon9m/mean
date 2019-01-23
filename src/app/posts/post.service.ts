@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { map } from 'rxjs/operators';
+import { Title } from '@angular/platform-browser';
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
@@ -24,7 +25,8 @@ export class PostService {
           return {
             title: post.title,
             content: post.content,
-            id: post._id
+            id: post._id,
+            imagepath: post.imagepath
           };
         });
       }))
@@ -40,12 +42,19 @@ export class PostService {
     return this.postSubject.asObservable();
   }
 
-  addPost(post: Post) {
-    this.http.post<{ message: string, postId: string }>('http://localhost:3000/api/posts', post).subscribe(resp => {
+  addPost(post: Post, image: File) {
+    const postData = new FormData();
+    postData.append('title', post.title);
+    postData.append('content', post.content);
+    postData.append('image', image, post.title);
+
+
+    this.http.post<{ message: string, post: Post }>('http://localhost:3000/api/posts', postData).subscribe(resp => {
       console.log(resp.message);
 
       // set newly creted post id
-      post.id = resp.postId;
+      post.id = resp.post.id;
+      post.imagepath = resp.post.imagepath;
 
       this.posts.push(post);
       this.postSubject.next([...this.posts]);

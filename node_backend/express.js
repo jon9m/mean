@@ -1,10 +1,37 @@
 //Express server
+const path = require('path');
 const express = require('express');
 const app = express();
 const bodyparser = require('body-parser');
 
 const Post = require('./models/post');
 const mongoose = require('mongoose');
+
+const MIME_TYPE_MAP = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg'
+};
+
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    console.log("Destination " + file.mimetype);
+    const isValid = MIME_TYPE_MAP[file.mimetype];
+    let err = new Error('Invaid mime type');
+    if (isValid) {
+      err = null;
+    }
+    callback(err, 'node_backend/images');
+  },
+  filename: (req, file, cb) => {
+    const name = file.originalname.toLowerCase().split(' ').join('-');
+    console.log("Filename " + name);
+
+    const ext = MIME_TYPE_MAP[file.mimetype];
+    cb(null, name + '-' + Date.now() + '.' + ext);
+  }
+});
 
 mongoose.connect('mongodb+srv://manoj:Zaq!xsw2cde3@cluster0-2m8vj.mongodb.net/mean').then(() => {
   console.log('connected to the databse');
@@ -21,6 +48,9 @@ mongoose.connect('mongodb+srv://manoj:Zaq!xsw2cde3@cluster0-2m8vj.mongodb.net/me
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: false }));
 
+//Static content
+app.use("/images", express.static(path.join('node_backend/images')));
+
 //Cross origin allow header middleware
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -30,10 +60,12 @@ app.use((req, res, next) => {
 });
 
 //npm install --save body-parser
-app.post('/api/posts', (req, res, next) => {
+app.post('/api/posts', multer({ storage: storage }).single('image'), (req, res, next) => {
+  const url = req.protocol + '://' + req.get('host');
   const post = new Post({ //Mongoose Schema
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagepath: url + '/images/' + req.file.filename
   });
 
   //Save to DB
@@ -41,7 +73,10 @@ app.post('/api/posts', (req, res, next) => {
     console.log(createdPost);
     res.status(201).json({
       message: 'Post added successfully',
-      postId: createdPost._id
+      post: {
+        ...createdPost,
+        id: createdPost._id
+      }
     });   //201 - Add new resource
   });
 
