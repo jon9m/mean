@@ -8,7 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeaderComponent } from './header/header.component';
 import { PostListComponent } from './posts/post-list/post-list.component';
 
-import { MatInputModule, MatCardModule, MatButtonModule, MatToolbarModule } from '@angular/material';
+import { MatInputModule, MatCardModule, MatButtonModule, MatToolbarModule, MatPaginatorModule } from '@angular/material';
 import { MatExpansionModule, MatProgressSpinnerModule } from '@angular/material';
 
 import { HttpClientModule } from '@angular/common/http';
@@ -32,7 +32,8 @@ import { AppRoutingModule } from './app-routing.module';
     MatExpansionModule,
     HttpClientModule,
     AppRoutingModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatPaginatorModule
 
   ],
   // providers: [PostService],  //New - see Injecteable - provided in the service
